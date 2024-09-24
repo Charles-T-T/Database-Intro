@@ -49,6 +49,8 @@ class GoodsManager:
         self.goods_df = pd.read_excel(goods_path)
         self.stock_df = pd.read_excel(stock_path)
         self.stock_df['操作时间'] = pd.to_datetime(self.stock_df['操作时间']).dt.date
+        self.goods_path = goods_path
+        self.stock_path = stock_path
 
     # 库存管理
     op = {
@@ -84,7 +86,7 @@ class GoodsManager:
         else:
             print(df_to_table(group))
 
-    def delete_by_id(self, id: int): 
+    def delete_by_id(self, id: int):
         """ 按商品编号从目录中删除商品 """
         df = self.goods_df
         if id not in df['商品编号'].values:
@@ -114,7 +116,7 @@ class GoodsManager:
         df1 = self.stock_df
         df1.loc[len(df1)] = [id, name, self.op[type], person, time, count]
 
-    def show_main_menu(self):  
+    def show_main_menu(self):
         """ 主菜单 """
         print("----------------------")
         print("    商城库存管理系统   ")
@@ -131,9 +133,8 @@ class GoodsManager:
         choice = input_legal_int("> 请选择要进行的操作(0-6): ", 0, 6)
         clear_screen()
         match choice:
-            case 0:
-                print("> 欢迎下次使用，再见！")
-                sys.exit()
+            case 0:  # TODO 保存更改
+                self.func0()
             case 1:
                 self.func1()
             case 2:
@@ -160,7 +161,7 @@ class GoodsManager:
     def func2(self):
         """ 功能2-记录库存变动 """
         clear_screen()
-        # todo 错误情况判断
+        
         df = self.goods_df
         id = input_legal_int("> 请输入商品编号：", self.MIN_ID, self.MAX_ID)
         if id not in df['商品编号'].values:
@@ -184,7 +185,7 @@ class GoodsManager:
             if type == 2 and count > df.loc[df['商品编号'] == id, '库存量'].iloc[0]:
                 print("库存量不足！")
                 return
-            self.update_stock(id, type * count)
+            self.update_stock(id, (3 - 2 * type) * count)
         else:
             self.add_new_goods(id, name, kind, count)
 
@@ -301,6 +302,21 @@ class GoodsManager:
                                 & (target["操作时间"] <= end_date)]
 
         print("总销量为：", target['操作数量'].sum())
+
+    def save_change(self):
+        """ 保存当前更改 """
+        self.goods_df.to_excel(self.goods_path, index=False)
+        self.stock_df.to_excel(self.stock_path, index=False)
+
+    def func0(self):
+        """ 退出时，询问是否保存更改 """
+        choice = input_legal_int("> 是否保存更改？(0:否, 1:是): ", 0, 1)
+        if (choice == 1):
+            self.save_change()
+            print("保存成功！")
+
+        print("> 欢迎下次使用，再见！")
+        sys.exit()
 
 
 def main():
