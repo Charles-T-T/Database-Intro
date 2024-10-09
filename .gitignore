@@ -1,10 +1,10 @@
 /textbook
 
 /ppt
+ 
+submit/
 
-**/submit
-
-**/script
+draft/
 
 *.docx
 *.doc
