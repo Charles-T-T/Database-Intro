@@ -21,6 +21,7 @@
 实现销量汇总功能，能够查询在一定时间范围内全部商品或某类商品的总销量。
 
 ```shell
+lab1/
 ├── docs/
 │   ├── requirements.md     # 实验要求
 │   └── report.md     		# 实验报告
@@ -28,7 +29,7 @@
 │   ├── goods.xlsx	        # 商品目录
 │   └── stock.xlsx     		# 商品库存记录（少量）
 │   └── new_stock.xlsx     	# 商品库存记录（大量）
-├── src/                    
-│   └── lab1.py  			# 实验代码
+└── src/                    
+    └── lab1.py  			# 实验代码
 ```
 
