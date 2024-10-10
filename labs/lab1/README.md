@@ -23,12 +23,12 @@
 ```shell
 ├── docs/
 │   ├── requirements.md     # 实验要求
-│   └── report.md     		# 实验报告
+│   └── report.md           # 实验报告
 ├── data/ 
-│   ├── goods.xlsx	        # 商品目录
-│   └── stock.xlsx     		# 商品库存记录（少量）
-│   └── new_stock.xlsx     	# 商品库存记录（大量）
+│   ├── goods.xlsx          # 商品目录
+│   └── stock.xlsx          # 商品库存记录（少量）
+│   └── new_stock.xlsx      # 商品库存记录（大量）
 ├── src/                    
-│   └── lab1.py  			# 实验代码
+│   └── lab1.py             # 实验代码
 ```
 
