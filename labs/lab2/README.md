@@ -1,6 +1,6 @@
 # 实验二  DBMS软件安装及数据定义语句
 
-- 掌握常见DBMS软件安装及使用方法（本次选择华为的openGause）
+- 掌握常见DBMS软件安装及使用方法（本次选择华为的openGauss）
 - 尝试简单的SQL语句
 
 ```shell
