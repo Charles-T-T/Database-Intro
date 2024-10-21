@@ -420,7 +420,7 @@
 
   > 没有条件，直接“合并同类列”
 
-## SQL语言
+# 第三章：SQL语言
 
 > 一条SQL语句以分号结尾
 
@@ -429,3 +429,18 @@
 > CHAR：定长空间
 
  ![schema](./pics/schema)
+
+`GROUP BY` :
+
+![image-20241017103929570](./pics/image-20241017103929570.png)
+
+```SQL
+SELECT genre, AVG(budget)
+FROM movies
+GROUP BY genre;
+```
+
+
+
+# 第四章：数据库安全性
+
