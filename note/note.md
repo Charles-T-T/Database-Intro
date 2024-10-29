@@ -420,7 +420,7 @@
 
   > 没有条件，直接“合并同类列”
 
-# 第三章：SQL语言
+# 第三章 SQL语言
 
 > 一条SQL语句以分号结尾
 
@@ -440,7 +440,200 @@ FROM movies
 GROUP BY genre;
 ```
 
+`WHERE` 要在 `GROUP BY` 之前：
 
+![group_where](./pics/group_where)
 
-# 第四章：数据库安全性
+# 第四章 数据库安全性
+
+遵纪守法。
+
+## 存取控制
+
+### 存取控制机制组成
+
+- 定义用户权限，并将用户权限登记到**数据字典**中
+  - 用户对某一数据对象的操作权力称为权限
+  - DBMS提供适当的语言来定义用户权限，存放在数据字典中，称作安全规则或授权规则
+- 合法权限检查
+  - 用户发出存取数据库操作请求
+  - DBMS查找数据字典，进行合法权限检查
+
+**用户权限定义** 和 **合法权限检查机制** 一起组成了DBMS的存取控制子系统。
+
+### 常用存取控制方法
+
+- **自主存取控制** （Discretionary Access Control, DAC）
+  - C2级
+  - 用户对不同的数据对象有不同的存取权限
+  - 不同的用户对同一对象有不同的权限
+  - 用户可以将其拥有的存取权限转授给其他用户
+- **强制存取控制** （Mandatory Access Control, MAC）
+  - B1级
+  - 每一个数据对象被标以一定的 **密级** 
+  - 每一个用户也被授予某一个级别的 **许可证** 
+  - 对于任意一个对象，只有具有合法许可证的用户才可以存取
+
+### 自主存取控制方法
+
+- 通过SQL的 `GRANT` 语句和 `REVOKE` 语句实现
+- 用户权限组成
+  - 数据库对象
+  - 操作类型
+- 定义用户存取权限：定义用户可以在哪些数据对象上进行哪些类型的操作
+- 定义存取权限称为 **授权** 
+
+### 授权：授予&收回
+
+#### `GRANT` 
+
+`GRANT` 语句的一般格式：
+
+```SQL
+GRANT <权限>[,<权限>]...
+ON <对象类型><对象名>[,<对象类型><对象名>]...
+TO <用户>[,<用户>]...
+[WITH GRANT OPTION];
+```
+
+语义：将对指定操作对象的指定操作权限授予指定的用户。
+
+- 发出 `GRANT` 
+  - 数据库管理员（DBA）
+  - 数据库对象创建者（即属主owner）
+  - 拥有该权限的用户
+- 接受权限的用户
+  - 一个或多个具体用户
+  - `PUBLIC` （即全体用户）
+
+`WITH GRANT OPTION` 语句
+
+- 指定：可以 **再授予**
+- 未指定： **不能传播** 
+
+> :warning: 不允许循环授权
+>
+> <img src="./pics/grant_option_no_loop" alt="grant_option_no_loop" width="350;" /> 
+
+- [ ] TODO：例子
+
+#### `REVOKE` 
+
+授予的权限可以有数据库管理员或其他授权者用 `REVOKE` 语句收回。
+
+`REVOKE` 语句的一般格式为：
+
+```SQL
+REVOKE <权限>[,<权限>]...
+ON <对象类型><对象名>[,<对象类型><对象名>]...
+FROM <用户>[,<用户>]...[CASCADE|RESTRICT];
+```
+
+- 指定了 `CASCADE` ，则 **级联收回** 授予的权限
+- 指定了 `RESTRICT` ，如果转授了权限，则不能收回
+- 默认值为 `RESTRICT` 
+
+- [ ] TODO：例子
+
+# 第五章 数据库完整性
+
+为了维护数据库的完整性，RDBMS必须实现：
+
+1. 提供定义完整性约束的机制
+
+2. 提供完整性约束的方法
+
+3. 提供完整性违约处理的方法
+
+   - RDBMS若发现用户的操作违背了完整性约束，就采取一定的动作
+
+     - 拒绝（NO ACTION）执行此操作
+
+     - 级联（CASCADE）执行其他操作
+
+## 实体完整性
+
+关系模型的实体完整性在 `CREATE TABLE` 中用 `PRIMARY KEY` 定义。
+
+对单属性构成的码有两种说明方法：
+
+- 定义为列级约束
+- 定义为表级约束
+
+对多个属性构成的码只有一种说明方法：
+
+- 定义为表级约束
+
+**实体完整性检查和违约处理：**
+
+- 检查主码值是否唯一，如果不唯一则拒绝插入或修改
+- 检查主码的各个属性是否为空，只要有一个为空就拒绝插入或修改
+
+## 参照完整性
+
+关系模型的参照完整性在 `CREATE TABLE` 中用 `FOREIGN KEY` 短语定义哪些列为外码，用 `REFERENCES` 短语指明这些外码参照哪些表的主码。
+
+**参照完整性检查和违约处理**
+
+| 被参照表（如Student） | 参照表（如SC） | 违约处理 |
+| :--------------------: | :--------------: | :--------: |
+| 可能破坏参照完整性 :arrow_left: | :arrow_left: 插入元组 | 拒绝 |
+| 可能破坏参照完整性 :arrow_left: | :arrow_left: 修改外码值 | 拒绝 |
+| 删除元组 :arrow_right: | :arrow_right: 可能破坏参照完整性 | 拒绝/级联删除/设置为空值 |
+| 修改主码值 :arrow_right: | :arrow_right: 可能破坏参照完整性 | 拒绝/级联删除/设置为空值 |
+
+## 用户定义的完整性
+
+### 属性上的约束
+
+在 `CREATE TABLE` 中定义属性的同时，可以根据应用要求定义属性上的约束，即属性值限制，包括
+
+- 列值非空（ `NOT NULL` ）
+- 列值唯一（ `UNIQUE` ）
+- 检查列值是否满足一个条件表达式（ `CHECK` 短语）
+
+### 元组上的约束
+
+与属性上的约束类似，在 `CREATE TABLE` 语句中可以用 `CHECK` 短语定义元组上的约束，即元组级的限制。同属性值限制相比，元组级的限制可以设置不同属性之间取值的相互约束。
+
+> *e.g.* 增加约束：当学生的性别是“男”时，其姓名（ `Sname` ）不能以 'Ms.' 打头
+>
+> ```sql
+> CREATE TABLE Student
+> 	(Sno CHAR(8),
+>      Sname CHAR(20) NOT NULL,
+>      Ssex CHAR(6),
+>      Sbirthdate DATE,
+>      Smajor VARCHAR(40),
+>      PRIMARY KEY (Sno),
+>      CHECK (Ssex='女' OR Sname NOT LIKE 'MS.%')
+>     ); /*定义了元组中Sname和Ssex两个属性之间的约束条件*/
+> ```
+
+元组上约束的检查和违约处理：不满足则拒绝操作执行。
+
+## 完整性约束命名子句
+
+格式： `CONSTRAINT <完整性约束名> <完整性约束>` 
+
+其中， `<完整性约束>` 包括 `NOT NULL` , `UNIQUE` , `PRIMARY KEY` , `FOREIGN KEY` , `CHECK` 短语等。
+
+> *e.g.* 
+>
+> ```sql
+> CREATE TABLE Student
+>     (Sno CHAR(8)
+>      CONSTRAINT Cl CHECK(Sno BETWEEN '10000000' AND '299999991'),
+>      Sname CHAR(20)
+>      CONSTRAINT C2 NOT NULL,
+>      Sbirthdate Date
+>      CONSTRAINT C3 CHECK( Sbirthdate >'1980-1-1'),
+>      Ssex CHAR(6)
+>      CONSTRAINT C4 CHECK(Ssex IN(男，女)),
+>      Smajor VARCHAR(40),
+>      CONSTRAINT StudentKey PRIMARY KEY(Sno)
+>     );
+> ```
+
+:warning: 注意，记得为每个完整性约束起名。
 
